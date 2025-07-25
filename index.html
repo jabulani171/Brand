@@ -1,0 +1,288 @@
+<script type="text/javascript">
+        var gk_isXlsx = false;
+        var gk_xlsxFileLookup = {};
+        var gk_fileData = {};
+        function filledCell(cell) {
+          return cell !== '' && cell != null;
+        }
+        function loadFileData(filename) {
+        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
+            try {
+                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
+                var firstSheetName = workbook.SheetNames[0];
+                var worksheet = workbook.Sheets[firstSheetName];
+
+                // Convert sheet to JSON to filter blank rows
+                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
+                // Filter out blank rows (rows where all cells are empty, null, or undefined)
+                var filteredData = jsonData.filter(row => row.some(filledCell));
+
+                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
+                var headerRowIndex = filteredData.findIndex((row, index) =>
+                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
+                );
+                // Fallback
+                if (headerRowIndex === -1 || headerRowIndex > 25) {
+                  headerRowIndex = 0;
+                }
+
+                // Convert filtered JSON back to CSV
+                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
+                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
+                return csv;
+            } catch (e) {
+                console.error(e);
+                return "";
+            }
+        }
+        return gk_fileData[filename] || "";
+        }
+        </script><!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Brandscapers Africa</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            overflow-x: hidden;
+        }
+        .navbar {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background-color: #fff;
+            padding: 10px 0;
+            text-align: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            z-index: 1000;
+        }
+        .navbar a {
+            color: #0078d4;
+            text-decoration: none;
+            margin: 0 15px;
+            font-weight: bold;
+        }
+        .navbar .active {
+            border-bottom: 2px solid #0078d4;
+        }
+        .social-icons {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+        }
+        .social-icons img {
+            width: 20px;
+            margin-right: 10px;
+        }
+        .section {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            padding: 20px;
+            background-size: cover;
+            background-position: center;
+            color: #fff;
+            position: relative;
+        }
+        #home {
+            background-image: url('https://example.com/giraffe-sunset.jpg');
+        }
+        #scope-us {
+            background-image: url('https://example.com/camera-hand.jpg');
+        }
+        #our-grid {
+            background-image: url('https://example.com/farming-group.jpg');
+        }
+        #the-glow {
+            background-image: url('https://example.com/elephant-sunset.jpg');
+        }
+        #the-trust, #our-hype, #the-streets, #hit-us-up {
+            background-color: #fff;
+            color: #000;
+        }
+        .section h1 {
+            font-size: 3em;
+            margin-bottom: 20px;
+        }
+        .section p {
+            font-size: 1.2em;
+            max-width: 600px;
+        }
+        .read-more {
+            margin-top: 20px;
+            padding: 10px 20px;
+            background-color: #ffd700;
+            color: #000;
+            text-decoration: none;
+            border-radius: 5px;
+        }
+        .services-list {
+            text-align: left;
+            font-size: 1.1em;
+        }
+        .logos, .awards {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            padding: 20px;
+        }
+        .logos img, .awards img {
+            width: 150px;
+            height: auto;
+        }
+        .videos {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            padding: 20px;
+        }
+        .videos video {
+            width: 200px;
+            height: auto;
+        }
+        .contact-form {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .contact-form input, .contact-form textarea {
+            width: 200px;
+            margin: 10px;
+            padding: 10px;
+            border: 1px solid #ccc;
+        }
+        .contact-form button {
+            padding: 10px 20px;
+            background-color: #ffd700;
+            border: none;
+            cursor: pointer;
+        }
+        .fade {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.5), transparent);
+        }
+    </style>
+</head>
+<body>
+    <div class="navbar">
+        <div class="social-icons">
+            <img src="https://via.placeholder.com/20" alt="Facebook">
+            <img src="https://via.placeholder.com/20" alt="Twitter">
+            <img src="https://via.placeholder.com/20" alt="Instagram">
+       </div>
+        <a href="#home">HOME</a>
+        <a href="#scope-us">SCOPE US</a>
+        <a href="#our-grid">OUR GRIND</a>
+        <a href="#the-glow">THE GLOW</a>
+        <a href="#the-trust">THE TRUST</a>
+        <a href="#our-hype">OUR HYPE</a>
+        <a href="#the-streets">THE STREETS</a>
+        <a href="#hit-us-up">HIT US UP</a>
+    </div>
+
+    <div id="home" class="section">
+        <div class="fade"></div>
+        <h1>Brandscapers Africa</h1>
+        <p><strong>Young, Creative, Bold and Energetic.</strong></p>
+        <p>Brandscapers Africa is an African award-winning marketing and consulting agency with a diverse interactive team. Over 20 years of excellence in marketing.</p>
+        <a href="#" class="read-more">Read More</a>
+        <a href="#" class="read-more">Explore Our Work</a>
+    </div>
+
+    <div id="scope-us" class="section">
+        <img src="https://example.com/camera-hand.jpg" alt="Camera Hand" style="float: left; margin-right: 20px; width: 200px;">
+        <h1>Scope Us</h1>
+        <p>Brandscapers Africa is an African award-winning marketing and consulting agency with a diverse interactive team. We pride ourselves on developing strong relationships with clients to produce the desired results. Our services include but are not limited to:</p>
+        <ul class="services-list">
+            <li>Branding</li>
+            <li>Digital Marketing</li>
+            <li>Consulting</li>
+        </ul>
+        <p>Ready to collaborate? Reach out today! <em>"Great team to work with! - Client Name"</em></p>
+    </div>
+
+    <div id="our-grid" class="section">
+        <h1>Our Grind</h1>
+        <ul class="services-list">
+            <li>Public Relations: Building strong brand narratives</li>
+            <li>360 Marketing: Comprehensive campaign strategies</li>
+            <li>Strategy Advisory: Expert business insights</li>
+            <li>Media Monitoring: Real-time market analysis</li>
+            <li>Event and Campaign Management: Seamless execution</li>
+            <li>Project Management: Efficient coordination</li>
+            <li>Media Buying: Optimal ad placements</li>
+        </ul>
+        <p>Managed over 100 campaigns successfully.</p>
+    </div>
+
+    <div id="the-glow" class="section">
+        <div class="fade"></div>
+        <h1>THE GLOW</h1>
+        <p>Celebrating African Wildlife</p>
+        <p>Home to over 1,000 wildlife species.</p>
+    </div>
+
+    <div id="the-trust" class="section">
+        <h1>THE TRUST</h1>
+        <div class="logos">
+            <img src="https://via.placeholder.com/150" alt="Nedbank">
+            <img src="https://via.placeholder.com/150" alt="HWSETA">
+            <img src="https://via.placeholder.com/150" alt="Exxaro">
+            <img src="https://via.placeholder.com/150" alt="Shell">
+            <img src="https://via.placeholder.com/150" alt="National Lotteries Commission">
+            <img src="https://via.placeholder.com/150" alt="Eskom Foundation">
+        </div>
+        <p>Trusted by leading African brands. Proud partners with 6+ industry leaders.</p>
+    </div>
+
+    <div id="our-hype" class="section">
+        <h1>OUR HYPE</h1>
+        <div class="awards">
+            <img src="https://via.placeholder.com/150" alt="BBQ Awards">
+            <img src="https://via.placeholder.com/150" alt="Top Empowerment Finalist">
+            <img src="https://via.placeholder.com/150" alt="Men of the Year Awards">
+            <img src="https://via.placeholder.com/150" alt="MIPD 100 Under 40">
+        </div>
+        <p>Recognized for Excellence. Over 10 awards won!</p>
+    </div>
+
+    <div id="the-streets" class="section">
+        <h1>THE STREETS</h1>
+        <div class="videos">
+            <video controls><source src="https://via.placeholder.com/200x150" type="video/mp4"><br>Motivation: Pires the Youth<br>Views: 1.2K, Jul 2025</video>
+            <video controls><source src="https://via.placeholder.com/200x150" type="video/mp4"><br>Trade & Tricks<br>Views: 900, Jul 2025</video>
+            <video controls><source src="https://via.placeholder.com/200x150" type="video/mp4"><br>South Africans Doing Great Things<br>Views: 1.5K, Jul 2025</video>
+            <video controls><source src="https://via.placeholder.com/200x150" type="video/mp4"><br>Emmanuel Bonoko Wins Empe...<br>Views: 800, Jul 2025</video>
+            <video controls><source src="https://via.placeholder.com/200x150" type="video/mp4"><br>Wake Up On METRO FM<br>Views: 1.1K, Jul 2025</video>
+            <video controls><source src="https://via.placeholder.com/200x150" type="video/mp4"><br>EBonoko Holdings Founder sh...<br>Views: 700, Jul 2025</video>
+        </div>
+        <p>Latest Media Highlights</p>
+    </div>
+
+    <div id="hit-us-up" class="section">
+        <h1>Hit Us Up</h1>
+        <form class="contact-form">
+            <input type="text" placeholder="Your Name" required>
+            <input type="email" placeholder="Your Email" required>
+            <input type="text" placeholder="Your Phone" required>
+            <input type="text" placeholder="Subject" required>
+            <textarea placeholder="Text" required></textarea>
+            <button type="submit">Send Message</button>
+        </form>
+        <p>We respect your privacy. Thanks for reaching out! We’ll reply soon.</p>
+    </div>
+</body>
+</html>
